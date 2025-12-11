@@ -35,16 +35,25 @@ $country = isset($_GET['country']) ? trim($_GET['country']) : 'us';
 
 // Use NewsAPI.org endpoint by default; change if you use another provider.
 $endpoint = 'https://newsapi.org/v2/top-headlines';
-$params = ['apiKey' => $apiKey];
+$params = [];
 if ($query !== '') $params['q'] = $query;
 else $params['country'] = $country;
 
-$url = $endpoint . '?' . http_build_query($params);
+$url = $endpoint . (empty($params) ? '' : '?' . http_build_query($params));
 
 // Make request via cURL
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+// Send API key and identify the client via HTTP headers.
+$headers = [
+	'X-Api-Key: ' . $apiKey,
+	'User-Agent: SimpleNewsViewer/1.0',
+	'Accept: application/json'
+];
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+// Also set CURLOPT_USERAGENT as some servers check that curl option.
+curl_setopt($ch, CURLOPT_USERAGENT, 'SimpleNewsViewer/1.0');
 $resp = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 if ($resp === false) {
