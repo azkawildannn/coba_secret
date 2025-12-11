@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "index.php": {
+      "runtime": "php:8.2"
+    }
+  },
+  "env": {
+    "NEWS_API_KEY": "@news_api_key"
+  }
+}
