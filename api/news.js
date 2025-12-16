@@ -1,4 +1,15 @@
 export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   const apiKey = process.env.NEWS_API_KEY;
 
   if (!apiKey) {
@@ -8,21 +19,18 @@ export default async function handler(req, res) {
     });
   }
 
-  const query = req.query.q || '';
-  const country = req.query.country || 'us';
-
-  const endpoint = 'https://newsapi.org/v2/top-headlines';
-  const params = new URLSearchParams();
-  
-  if (query) {
-    params.append('q', query);
-  } else {
-    params.append('country', country);
-  }
-
-  const url = `${endpoint}?${params.toString()}`;
-
   try {
+    const q = req.query.q || '';
+    const country = req.query.country || 'us';
+
+    let url;
+
+    if (q) {
+      url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}`;
+    } else {
+      url = `https://newsapi.org/v2/top-headlines?country=${encodeURIComponent(country)}`;
+    }
+
     const response = await fetch(url, {
       headers: {
         'X-Api-Key': apiKey,
@@ -37,10 +45,15 @@ export default async function handler(req, res) {
     }
 
     res.status(200).json(data);
+
   } catch (error) {
     res.status(500).json({
       error: 'Request failed',
       message: error.message
     });
   }
-}
+});
+
+app.listen(PORT, () => {
+  console.log(`✅ API berjalan di http://localhost:${PORT}`);
+});

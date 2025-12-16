@@ -269,7 +269,9 @@
 				if (q) params.append('q', q);
 				else params.append('country', country);
 				
-				const response = await fetch(`/api/news?${params}`);
+				// Auto-detect domain - works for both localhost and Vercel
+				const baseUrl = window.location.origin;
+				const response = await fetch(`${baseUrl}/api/news?${params}`);
 				const data = await response.json();
 				
 				if (!response.ok) {
@@ -310,6 +312,7 @@
 					<div class="error-message">
 						<h2>❌ Error</h2>
 						<p>${error.message}</p>
+						<small>Pastikan API sudah di-deploy atau NEWS_API_KEY sudah di-set</small>
 					</div>
 				`;
 			}

@@ -1,0 +1,15 @@
+check_html_content() {
+  FILE="main/berita/index.html"
+
+  if [ ! -f "$FILE" ]; then
+    echo "❌ index.html tidak ditemukan"
+    exit 1
+  fi
+
+  if grep -qiE "<html|<body|<!DOCTYPE html" "$FILE"; then
+    echo "✅ index.html mengandung kode HTML"
+  else
+    echo "❌ index.html TIDAK mengandung kode HTML"
+    exit 1
+  fi
+}
